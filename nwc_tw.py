@@ -122,7 +122,7 @@ def gen_dat(f_name, nwc_param):
 
 
 def main():
-    N = int(1024)
+    N = int(512)
     lvl = int(math.log2(N))
     tw_rom = TW_ROM(N)
     nwc_param = NWC_PARAM(lvl)

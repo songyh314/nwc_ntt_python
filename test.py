@@ -1,5 +1,6 @@
 import sympy as sym
 import param
+import tool
 
 
 def find_sol_prime(L, H):
@@ -11,18 +12,24 @@ def find_sol_prime(L, H):
 
 
 def main():
-    p = 65537
-    print(sym.primitive_root(p))
-    a = 255
-    b = 65280
-    tw = 256
-    add = addsacle(a,b)
-    sub = subsacle(a,b)
-    mu = (sub*tw)%param.MOD
-    print("a = ",a," b = ",b," tw = ",tw)
-    print("add = ", add)
-    print("sub = ", sub)
-    print("mult = ", mu)
+    # p = 65537
+    # print(sym.primitive_root(p))
+    # a = 255
+    # b = 65280
+    # tw = 256
+    # add = addsacle(a,b)
+    # sub = subsacle(a,b)
+    # mu = (sub*tw)%param.MOD
+    # print("a = ",a," b = ",b," tw = ",tw)
+    # print("add = ", add)
+    # print("sub = ", sub)
+    # print("mult = ", mu)
+
+    p = 2**24 - 2**14 + 1
+    g = sym.primitive_root(p)
+    mul = (p-1)**2
+    print(tool.data_fix(mul,12))
+    print(p,g)
 
 
 def addsacle(a, b):

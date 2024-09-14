@@ -1,6 +1,7 @@
 import sympy as sym
 import math
 import pathlib as path
+import numpy as np
 
 
 def create_folder(folder_name):
@@ -18,6 +19,28 @@ def data_fix(data, length):
     return padded_hex
 
 
+
+
+def negacyclic_conv(a, b):
+    """
+    计算两个向量 a 和 b 的负环卷积
+    :param a: 输入向量 1
+    :param b: 输入向量 2
+    :return: 负环卷积的结果
+    """
+    n = len(a)
+    # 结果的初始化
+    result = np.zeros(n)
+
+    for k in range(n):
+        for i in range(n):
+            # 计算索引并处理负环效应
+            j = (k - i) % n
+            # 判断是否要引入负号
+            sign = -1 if (k - i) >= n else 1
+            result[k] += a[i] * b[j] * sign
+
+    return result
 
 def bit_rev(vec):
     j = 0

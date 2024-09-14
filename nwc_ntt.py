@@ -1,11 +1,13 @@
 import random
 
+
 import nwc_tw
 import ntt_fun
 import tool
 import math
 import param
 import numpy as np
+from scipy.signal import convolve
 
 
 def dit_nr(dit_in, tw, N):
@@ -52,10 +54,10 @@ def dif_rn(dif_in, tw, N):
                 tw_fac = tw[i][tw_index]
                 temp_add = (dif_res[posa] + dif_res[posb]) % param.MOD
                 temp_sub = (dif_res[posa] - dif_res[posb]) % param.MOD
-                if (temp_add%2 == 0):
+                if (temp_add % 2 == 0):
                     temp_add = temp_add >> 1
                 else:
-                    temp_add = (temp_add >> 1) + ((param.MOD + 1)>>1)
+                    temp_add = (temp_add >> 1) + ((param.MOD + 1) >> 1)
 
                 if (temp_sub % 2 == 0):
                     temp_sub = temp_sub >> 1
@@ -67,29 +69,57 @@ def dif_rn(dif_in, tw, N):
     return dif_res
 
 
+def NcConv(a, b, nwc_param):
+    N = len(a)
+    N2 = len(b)
+    assert N == N2, "input array should be same in length"
+    NttRes1 = dit_nr(a, nwc_param.w_rom, N)
+    NttRes2 = dit_nr(b, nwc_param.w_rom, N)
+    MulRes = list(0 for _ in range(N))
+    for i in range(N):
+        MulRes[i] = (NttRes1[i] * NttRes2[i]) % param.MOD
+    InttRes = dif_rn(MulRes, nwc_param.inv_w_rom, N)
+    for i in range(N):
+        if InttRes[i] > (param.MOD - 1) >> 1:
+            InttRes[i] -= param.MOD
+    return InttRes
+
+# def applyNtt()
+
+
 def main():
-    N = 8
+    N = 2
     lvl = int(math.log2(N))
     tw_rom = nwc_tw.TW_ROM(N)
     nwc_param = nwc_tw.NWC_PARAM(lvl)
     nwc_tw.gen_tw(tw_rom)
     nwc_tw.genNWC(tw_rom, nwc_param, "NWC-DIF-RN-INNT")
     nwc_tw.genNWC(tw_rom, nwc_param, "NWC-DIT-NR-NNT")
-    a = list(range(N))
+    a = list(0 for _ in range(N))
+    b = list(0 for _ in range(N))
+    for i in range(N-1):
+        a[i] = (1 << 7) - 1
+        b[i] = (1 << 7) - 1
+    # a = [param.IntMAX, param.IntMAX, param.IntMAX, param.IntMAX]
+    # b = [5, 6, 7, 8]
+
+    ntt_res1 = dit_nr(a, nwc_param.w_rom, N)
+    ntt_res2 = dit_nr(b, nwc_param.w_rom, N)
+    print("a:", a)
+    print("Ntt a:", ntt_res1)
+    intt_res1 = dif_rn(ntt_res1, nwc_param.inv_w_rom,N)
+    print(intt_res1)
+    # print("b:", b)
+    # print("nwc res:", mulRes)
+
+    # ntt_res2 = dit_nr(b, nwc_param.w_rom, N)
+    mul_res = list(0 for _ in range(N))
+    res = list(0 for _ in range(N))
     for i in range(N):
-        a[i] = 65536
+        mul_res[i] = (ntt_res1[i] * ntt_res2[i]) % param.MOD
 
-
-    ntt_res = dit_nr(a, nwc_param.w_rom, N)
-    intt_res = dif_rn(ntt_res, nwc_param.inv_w_rom, N)
-    print(a)
-    print("ntt:",ntt_res)
-    print(intt_res)
-    for i in range(N):
-        if a[i] != int(intt_res[i]):
-            print("error at %d", i)
-            print("a = ", a[i]," res = ",intt_res[i])
-
+    res = dif_rn(mul_res, nwc_param.inv_w_rom, N)
+    print(res)
 
 
 if __name__ == '__main__':
