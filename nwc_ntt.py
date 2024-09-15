@@ -1,11 +1,11 @@
 import random
 
-
 import nwc_tw
 import ntt_fun
 import tool
 import math
 import param
+from param import MOD,HalfMod,PolyMax
 import numpy as np
 from scipy.signal import convolve
 
@@ -84,11 +84,53 @@ def NcConv(a, b, nwc_param):
             InttRes[i] -= param.MOD
     return InttRes
 
-# def applyNtt()
 
+def applyNttSignedInput(SignedIn, tw, N):
+    UnsignedIn = list(0 for _ in range(N))
+    for i in range(N):
+        if SignedIn[i] < 0:
+            UnsignedIn[i] = SignedIn[i] + MOD
+        else:
+            UnsignedIn[i] = SignedIn[i]
+    # NttRes = list(0 for _ in range(N))
+    NttRes = dit_nr(UnsignedIn, tw, N)
+    return NttRes
+
+
+def applyInttSignedOutput(UnsignedIn, tw, N):
+    InttRes = dif_rn(UnsignedIn, tw, N)
+    SignedInttRes = list(0 for _ in range(N))
+    res = list(0 for _ in range(N))
+    for i in range(N):
+        if InttRes[i] >= HalfMod:
+            SignedInttRes[i] = InttRes[i] - MOD
+        else:
+            SignedInttRes[i] = InttRes[i]
+        tmp = tool.getLowBits(SignedInttRes[i],8)
+        if tmp >= PolyMax:
+            res[i] = tmp - (PolyMax << 1)
+        else:
+            res[i] = tmp
+    return res
+
+
+def NttInttTest():
+    N = 512
+    lvl = int(math.log2(N))
+    tw_rom = nwc_tw.TW_ROM(N)
+    nwc_param = nwc_tw.NWC_PARAM(lvl)
+    nwc_tw.gen_tw(tw_rom)
+    nwc_tw.genNWC(tw_rom, nwc_param, "NWC-DIF-RN-INNT")
+    nwc_tw.genNWC(tw_rom, nwc_param, "NWC-DIT-NR-NNT")
+    a = list(0 for _ in range(N))
+    for i in range(N):
+        a[i] = -1
+    nttRes = applyNttSignedInput(a, nwc_param.w_rom, N)
+    inttRes = applyInttSignedOutput(nttRes, nwc_param.inv_w_rom, N)
+    print(inttRes)
 
 def main():
-    N = 2
+    N = 512
     lvl = int(math.log2(N))
     tw_rom = nwc_tw.TW_ROM(N)
     nwc_param = nwc_tw.NWC_PARAM(lvl)
@@ -97,7 +139,7 @@ def main():
     nwc_tw.genNWC(tw_rom, nwc_param, "NWC-DIT-NR-NNT")
     a = list(0 for _ in range(N))
     b = list(0 for _ in range(N))
-    for i in range(N-1):
+    for i in range(N - 1):
         a[i] = (1 << 7) - 1
         b[i] = (1 << 7) - 1
     # a = [param.IntMAX, param.IntMAX, param.IntMAX, param.IntMAX]
@@ -107,7 +149,7 @@ def main():
     ntt_res2 = dit_nr(b, nwc_param.w_rom, N)
     print("a:", a)
     print("Ntt a:", ntt_res1)
-    intt_res1 = dif_rn(ntt_res1, nwc_param.inv_w_rom,N)
+    intt_res1 = dif_rn(ntt_res1, nwc_param.inv_w_rom, N)
     print(intt_res1)
     # print("b:", b)
     # print("nwc res:", mulRes)
@@ -120,6 +162,8 @@ def main():
 
     res = dif_rn(mul_res, nwc_param.inv_w_rom, N)
     print(res)
+    NttInttTest()
+
 
 
 if __name__ == '__main__':

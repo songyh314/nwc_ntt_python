@@ -19,8 +19,6 @@ def data_fix(data, length):
     return padded_hex
 
 
-
-
 def negacyclic_conv(a, b):
     """
     计算两个向量 a 和 b 的负环卷积
@@ -42,6 +40,7 @@ def negacyclic_conv(a, b):
 
     return result
 
+
 def bit_rev(vec):
     j = 0
     N = len(vec)
@@ -56,3 +55,37 @@ def bit_rev(vec):
             temp = vec[j]
             vec[j] = vec[i]
             vec[i] = temp
+
+
+def genBinComplement(num, bitLen):
+    if num < 0:
+        num = (1 << bitLen) + num
+    else:
+        num & ((1 << bitLen) - 1)
+    str = format(num, f'0{bitLen}b')
+    return str
+
+
+def getLowBits(din, bitLen):
+    """
+        截取输入二进制的低bitLen位
+        :param din: input unsigned/signed
+        :param bitLen: 截取的位数
+        :return: 低bitLen位结果
+        """
+    mask = (1 << bitLen) - 1
+    lsb = din & mask
+    return lsb
+
+
+def main():
+    din = -1
+    bitLen = 4
+    lsb = getLowBits(din, bitLen)
+    print(genBinComplement(din, 8))
+    print(lsb)
+    print(format(lsb, '04b'))
+
+
+if __name__ == '__main__':
+    main()
