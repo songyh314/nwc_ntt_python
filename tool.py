@@ -2,6 +2,7 @@ import sympy as sym
 import math
 import pathlib as path
 import numpy as np
+import param
 
 
 def create_folder(folder_name):
@@ -85,6 +86,25 @@ def main():
     print(genBinComplement(din, 8))
     print(lsb)
     print(format(lsb, '04b'))
+
+
+def naiveConvModQ(a, b, q):
+    N = len(a)
+    res = list(0 for _ in range(N))
+    for i in range(N):
+        tmp = 0
+        for j in range(N):
+            if j <= i:
+                tmp += (a[j] * b[i - j]) % q
+            else:
+                tmp -= (a[j] * b[N + i - j]) % q
+        tmp = getLowBits(tmp, 8)
+        if tmp >= param.PolyMax:
+            res[i] = tmp - (param.PolyMax << 1)
+        else:
+            res[i] = tmp
+
+    return res
 
 
 if __name__ == '__main__':

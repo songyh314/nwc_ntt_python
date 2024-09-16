@@ -27,6 +27,7 @@ def test_ntt_intt():
     print(inttRes)
 
 
+@pytest.mark.ConvTest
 def test_conv():
     N = 512
     lvl = int(math.log2(N))
@@ -45,6 +46,17 @@ def test_conv():
     mulRes = list(0 for _ in range(N))
     for i in range(N):
         mulRes[i] = (NttRes1[i] * NttRes2[i]) % MOD
-    InttRes = applyInttSignedOutput(mulRes,nwc_param.inv_w_rom,N)
+    InttRes = applyInttSignedOutput(mulRes, nwc_param.inv_w_rom, N)
+    navRes = tool.naiveConvModQ(a, b, 1 << 7)
     print()
-    print((InttRes))
+    print("InttRes:", InttRes)
+    print("navRes:", navRes)
+
+
+@pytest.mark.bitslice
+def test_bit_slice():
+    a = -254
+    print()
+    print(bin(abs(a)))
+    print(tool.genBinComplement(a, 16))
+    print(tool.getLowBits(a, 8))

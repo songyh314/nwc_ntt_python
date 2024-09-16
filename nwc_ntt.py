@@ -102,10 +102,12 @@ def applyInttSignedOutput(UnsignedIn, tw, N):
     SignedInttRes = list(0 for _ in range(N))
     res = list(0 for _ in range(N))
     for i in range(N):
+        flag = 0
         if InttRes[i] >= HalfMod:
             SignedInttRes[i] = InttRes[i] - MOD
         else:
             SignedInttRes[i] = InttRes[i]
+        flag = (SignedInttRes[i] < 0)
         tmp = tool.getLowBits(SignedInttRes[i],8)
         if tmp >= PolyMax:
             res[i] = tmp - (PolyMax << 1)
@@ -142,8 +144,7 @@ def main():
     for i in range(N - 1):
         a[i] = (1 << 7) - 1
         b[i] = (1 << 7) - 1
-    # a = [param.IntMAX, param.IntMAX, param.IntMAX, param.IntMAX]
-    # b = [5, 6, 7, 8]
+
 
     ntt_res1 = dit_nr(a, nwc_param.w_rom, N)
     ntt_res2 = dit_nr(b, nwc_param.w_rom, N)
@@ -151,15 +152,10 @@ def main():
     print("Ntt a:", ntt_res1)
     intt_res1 = dif_rn(ntt_res1, nwc_param.inv_w_rom, N)
     print(intt_res1)
-    # print("b:", b)
-    # print("nwc res:", mulRes)
 
-    # ntt_res2 = dit_nr(b, nwc_param.w_rom, N)
     mul_res = list(0 for _ in range(N))
-    res = list(0 for _ in range(N))
     for i in range(N):
         mul_res[i] = (ntt_res1[i] * ntt_res2[i]) % param.MOD
-
     res = dif_rn(mul_res, nwc_param.inv_w_rom, N)
     print(res)
     NttInttTest()
