@@ -99,8 +99,8 @@ def naiveConvModQ(a, b, q):
             else:
                 tmp -= (a[j] * b[N + i - j]) % q
         tmp = getLowBits(tmp, 8)
-        if tmp >= param.PolyMax:
-            res[i] = tmp - (param.PolyMax << 1)
+        if tmp >= q:
+            res[i] = tmp - (q << 1)
         else:
             res[i] = tmp
 

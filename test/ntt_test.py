@@ -48,6 +48,7 @@ def test_conv():
         mulRes[i] = (NttRes1[i] * NttRes2[i]) % MOD
     InttRes = applyInttSignedOutput(mulRes, nwc_param.inv_w_rom, N)
     navRes = tool.naiveConvModQ(a, b, 1 << 7)
+    # assert mulRes == navRes
     print()
     print("InttRes:", InttRes)
     print("navRes:", navRes)
