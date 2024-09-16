@@ -1,4 +1,6 @@
 import pytest
+
+import nwc_ntt
 from nwc_ntt import applyNttSignedInput, applyInttSignedOutput
 import nwc_tw
 import ntt_fun
@@ -61,3 +63,46 @@ def test_bit_slice():
     print(bin(abs(a)))
     print(tool.genBinComplement(a, 16))
     print(tool.getLowBits(a, 8))
+
+
+@pytest.mark.ParamterTest
+def test_param():
+    N = 512
+    Q = 12289
+    nwcParam12289 = nwc_tw.initTwParam(N, Q)
+    print("fin")
+
+
+@pytest.mark.NwcPolyMulTest
+def test_NwcPolyMul():
+    N = 512
+    Q24 = 2**24 - 2**14 + 1
+    Q14 = 2**14 - 2**12 + 1
+    intgerMod8 = 1 << 8
+    intgerMod2 = 1 << 2
+    NwcParam24 = nwc_tw.initTwParam(N, Q24)
+    NwcParam14 = nwc_tw.initTwParam(N, Q14)
+    a = list(0 for _ in range(N))
+    b = list(0 for _ in range(N))
+    for i in range(N):
+        (a[i], b[i]) = (1, 1)
+    mulRes24 = nwc_ntt.NwcPolyMul(a, b, Q24, NwcParam24, intgerMod8)
+    mulRes14 = nwc_ntt.NwcPolyMul(a, b, Q14, NwcParam14, intgerMod2)
+    print()
+    print(mulRes24)
+    print(mulRes14)
+
+
+@pytest.mark.PolyMul
+def test_poly_mul():
+    N = 512
+    Q = 2**64 - 2**32 + 1
+    intgerMod = 32
+    NwcParam = nwc_tw.initTwParam(N, Q)
+    a = list(0 for _ in range(N))
+    b = list(0 for _ in range(N))
+    for i in range(N):
+        (a[i], b[i]) = (1, 1)
+    mulRes14 = nwc_ntt.NwcPolyMul(a, b, Q, NwcParam, intgerMod)
+    print()
+    print(mulRes14)
