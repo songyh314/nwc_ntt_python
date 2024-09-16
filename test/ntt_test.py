@@ -49,7 +49,7 @@ def test_conv():
     for i in range(N):
         mulRes[i] = (NttRes1[i] * NttRes2[i]) % MOD
     InttRes = applyInttSignedOutput(mulRes, nwc_param.inv_w_rom, N)
-    navRes = tool.naiveConvModQ(a, b, 1 << 7)
+    navRes = tool.naiveConvModQ(a, b, 8)
     # assert mulRes == navRes
     print()
     print("InttRes:", InttRes)
@@ -106,3 +106,20 @@ def test_poly_mul():
     mulRes14 = nwc_ntt.NwcPolyMul(a, b, Q, NwcParam, intgerMod)
     print()
     print(mulRes14)
+
+
+@pytest.mark.PolyMul12289
+def test_poly_mul_12289():
+    N = 256
+    Q = 12289
+    intgerMod = 3
+    NwcParam = nwc_tw.initTwParam(N, Q)
+    a = list(0 for _ in range(N))
+    b = list(0 for _ in range(N))
+    for i in range(N):
+        (a[i], b[i]) = (1, 1)
+    mulRes14 = nwc_ntt.NwcPolyMul(a, b, Q, NwcParam, intgerMod)
+    navRes = tool.naiveConvModQ(a, b, 3)
+    print()
+    print(mulRes14)
+    print(navRes)

@@ -88,19 +88,21 @@ def main():
     print(format(lsb, '04b'))
 
 
-def naiveConvModQ(a, b, q):
+def naiveConvModQ(a, b, P):
     N = len(a)
     res = list(0 for _ in range(N))
+    mod = 1 << P
+    halfmod = 1 << (P-1)
     for i in range(N):
         tmp = 0
         for j in range(N):
             if j <= i:
-                tmp += (a[j] * b[i - j]) % q
+                tmp += (a[j] * b[i - j]) % halfmod
             else:
-                tmp -= (a[j] * b[N + i - j]) % q
-        tmp = getLowBits(tmp, 8)
-        if tmp >= q:
-            res[i] = tmp - (q << 1)
+                tmp -= (a[j] * b[N + i - j]) % halfmod
+        tmp = getLowBits(tmp, P)
+        if tmp >= halfmod:
+            res[i] = tmp - mod
         else:
             res[i] = tmp
 
